@@ -62,7 +62,24 @@ async def reset(interaction:discord.Interaction):
     sql3 = "DROP TABLE IF EXISTS attTBL"
     cur.execute(sql3)
     cur.close()
-    await interaction.response.send_message(f"초기화")
+    await interaction.response.send_message(f"데이터베이스 초기화를 완료하였습니다.")
+
+@bot.tree.command(name="absentees")
+async def checkAbs(interaction:discord.Interaction):
+    conn = sqlite3.connect('Attendance.db')
+    cur = conn.cursor()
+    sql4 = "SELECT name FROM attTBL"
+    cur.execute(sql4)
+    appeared = []
+    for row in cur:
+        appeared.append(list(row))
+    appeared2 = list(itertools.chain(*appeared))
+    members = ['김세연', '김주미', '양진']
+    for i in appeared2:
+        members.remove(i)
+    absent = members
+    await interaction.response.send_message(f"출석 하지 않은 분들 명단 {absent}")
+    cur.close()
 
 try:
     bot.run(TOKEN)
