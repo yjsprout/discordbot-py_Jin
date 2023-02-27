@@ -1,12 +1,13 @@
 from cmath import log
 from distutils.sysconfig import PREFIX
 import discord
-from discord import app_commands
 from discord.ext import commands
-from datetime import datetime
+from datetime import datetime, date, time, timedelta, timezone
 import sqlite3
 from dotenv import load_dotenv
 import os
+import itertools
+
 load_dotenv()
 
 PREFIX = os.environ['PREFIX']
@@ -23,19 +24,27 @@ async def on_ready():
     except Exception as e :
         print(e)
 
+
 @bot.tree.command(name="출석체크")
-async def check(interaction: discord.Interaction):
-    date_time = datetime.today().strftime('%Y-%m-%d %H:%M')
-    await interaction.response.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_time}")
+async def att(interaction: discord.Interaction):
+    current_dateTime = datetime.now(tzinfo=timezone(timedelta(hours=9)))
+    year=current_dateTime.year
+    month=current_dateTime.month
+    day=current_dateTime.day
+    hour=current_dateTime.hour
+    minute=current_dateTime.minute
+    date_rec = year+'-'+month+'-'+day
+    time_rec = hour+':'+minute
+    await interaction.response.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_rec} {time_rec}")
     # user.name -> 실제 사용자 이름
     # user.display_name -> 서버에서 설정한 별명
 
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
-    sql1 = "CREATE TABLE IF NOT EXISTS attTBL(name text,date_time text);"
-    sql2 = "INSERT INTO attTBL(name,date_time) values (?,?);"
+    sql1 = "CREATE TABLE IF NOT EXISTS attTBL(name text,date text, time text);"
+    sql2 = "INSERT INTO attTBL(name,date,time) values (?,?,?);"
     cur.execute(sql1)
-    cur.execute(sql2, (interaction.user.display_name, date_time))
+    cur.execute(sql2, (interaction.user.display_name, date_rec, time_rec))
     conn.commit()
     cur.close()
 
