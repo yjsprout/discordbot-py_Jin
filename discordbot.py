@@ -2,7 +2,7 @@ from cmath import log
 from distutils.sysconfig import PREFIX
 import discord
 from discord.ext import commands
-from datetime import datetime, date, time, timedelta, timezone
+from datetime import datetime
 import sqlite3
 from dotenv import load_dotenv
 import os
@@ -27,8 +27,8 @@ async def on_ready():
 
 @bot.tree.command(name="출석체크")
 async def att(interaction: discord.Interaction):
-    date_rec = date.today().strftime('%Y-%m-%d')
-    time_rec = time.today().strftime('%H:%M')
+    date_rec = datetime.today().strftime('%Y-%m-%d')
+    time_rec = datetime.today().strftime('%H:%M')
 
     await interaction.response.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_rec} {time_rec}")
     # user.name -> 실제 사용자 이름
