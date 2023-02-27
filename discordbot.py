@@ -18,9 +18,9 @@ async def on_ready():
     print("봇 실행됨")
 
 @bot.command(name="출석체크")
-async def check():
+async def check(interaction: discord.Interaction):
     date_time = datetime.today().strftime('%Y-%m-%d %H:%M')
-    await bot.send_message(f"{user.display_name} 출석했습니다.\n{date_time}")
+    await interaction.response.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_time}")
     # user.name -> 실제 사용자 이름
     # user.display_name -> 서버에서 설정한 별명
 
@@ -29,32 +29,32 @@ async def check():
     sql1 = "CREATE TABLE IF NOT EXISTS attTBL(name text,date_time text);"
     sql2 = "INSERT INTO attTBL(name,date_time) values (?,?);"
     cur.execute(sql1)
-    cur.execute(sql2, (user.display_name, date_time))
+    cur.execute(sql2, (interaction.user.display_name, date_time))
     conn.commit()
     cur.close()
 
 @bot.command(name="db조회")
-async def db():
+async def db(interaction: discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     cur.execute('SELECT * FROM attTBL')
     lrow=[]
     for row in cur:
         lrow.append(list(row))
-    await bot.send_message(f"{lrow}")
+    await interaction.response.send_message(f"{lrow}")
     cur.close()
 
 @bot.command(name="resetdb")
-async def reset():
+async def reset(interaction:discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql3 = "DROP TABLE IF EXISTS attTBL"
     cur.execute(sql3)
     cur.close()
-    await bot.send_message(f"데이터베이스 초기화를 완료하였습니다.")
+    await interaction.response.send_message(f"데이터베이스 초기화를 완료하였습니다.")
 
 @bot.command(name="absentees")
-async def checkAbs():
+async def checkAbs(interaction:discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql4 = "SELECT name FROM attTBL"
@@ -67,7 +67,7 @@ async def checkAbs():
     for i in appeared2:
         members.remove(i)
     absent = members
-    await bot.send_message(f"출석 하지 않은 분들 명단 {absent}")
+    await interaction.response.send_message(f"출석 하지 않은 분들 명단 {absent}")
     cur.close()
 
 try:
