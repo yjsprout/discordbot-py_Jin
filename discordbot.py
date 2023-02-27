@@ -39,11 +39,6 @@ async def check(interaction: discord.Interaction):
     conn.commit()
     cur.close()
 
-@bot.tree.command(name="say")
-@app_commands.describe(thing_to_say = "What should I say?")
-async def say(interaction: discord.Interaction, thing_to_say: str):
-    await interaction.response.send_message(f"{interaction.user.name} said: '{thing_to_say}'")
-
 @bot.tree.command(name="db조회")
 async def db(interaction: discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
