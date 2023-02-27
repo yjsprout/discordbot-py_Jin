@@ -16,11 +16,6 @@ bot = commands.Bot(command_prefix="!", intents = discord.Intents.default())
 @bot.event
 async def on_ready():
     print("봇 실행됨")
-    try:
-        synced = await bot.sync()
-        print(f"Synced {len(synced)} command(s)")
-    except Exception as e :
-        print(e)
 
 @bot.command(name="출석체크")
 async def check():
