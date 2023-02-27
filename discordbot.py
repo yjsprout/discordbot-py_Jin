@@ -18,7 +18,7 @@ client = commands.Bot(command_prefix="!",intents = discord.Intents.default())
 async def on_ready():
     print("봇 실행됨")
     try:
-        synced = await discord.Integration.sync()
+        synced = await sync()
         print(f"Synced {len(synced)} command(s)")
     except Exception as e :
         print(e)
