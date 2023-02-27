@@ -1,6 +1,7 @@
 from cmath import log
 from distutils.sysconfig import PREFIX
 import discord
+from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
 import sqlite3
@@ -11,17 +12,21 @@ load_dotenv()
 PREFIX = os.environ['PREFIX']
 TOKEN = os.environ['TOKEN']
 
-client = commands.Bot(command_prefix="!",intents = discord.Intents.default())
+bot = commands.Bot(command_prefix="!", intents = discord.Intents.default())
 
-
-@client.event
+@bot.event
 async def on_ready():
     print("봇 실행됨")
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e :
+        print(e)
 
-@client.command(name="출석체크")
-async def check(ctx):
+@bot.tree.command(name="출석체크")
+async def check(interaction: discord.Interaction):
     date_time = datetime.today().strftime('%Y-%m-%d %H:%M')
-    await ctx.send(f"{client.user.display_name} 출석했습니다.\n{date_time}")
+    await interaction.response.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_time}")
     # user.name -> 실제 사용자 이름
     # user.display_name -> 서버에서 설정한 별명
 
@@ -30,32 +35,32 @@ async def check(ctx):
     sql1 = "CREATE TABLE IF NOT EXISTS attTBL(name text,date_time text);"
     sql2 = "INSERT INTO attTBL(name,date_time) values (?,?);"
     cur.execute(sql1)
-    cur.execute(sql2, (client.user.display_name, date_time))
+    cur.execute(sql2, (interaction.user.display_name, date_time))
     conn.commit()
     cur.close()
 
-@client.command(name="db조회")
-async def db(ctx):
+@bot.tree.command(name="db조회")
+async def db(interaction: discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     cur.execute('SELECT * FROM attTBL')
     lrow=[]
     for row in cur:
         lrow.append(list(row))
-    await ctx.send(f"{lrow}")
+    await interaction.response.send_message(f"{lrow}")
     cur.close()
 
-@client.command(name="resetdb")
-async def reset(ctx):
+@bot.tree.command(name="resetdb")
+async def reset(interaction:discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql3 = "DROP TABLE IF EXISTS attTBL"
     cur.execute(sql3)
     cur.close()
-    await ctx.send(f"데이터베이스 초기화를 완료하였습니다.")
+    await interaction.response.send_message(f"데이터베이스 초기화를 완료하였습니다.")
 
-@client.command(name="absentees")
-async def checkAbs(ctx):
+@bot.tree.command(name="absentees")
+async def checkAbs(interaction:discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql4 = "SELECT name FROM attTBL"
@@ -68,10 +73,10 @@ async def checkAbs(ctx):
     for i in appeared2:
         members.remove(i)
     absent = members
-    await ctx.send(f"출석 하지 않은 분들 명단 {absent}")
+    await interaction.response.send_message(f"출석 하지 않은 분들 명단 {absent}")
     cur.close()
 
 try:
-    client.run(TOKEN)
+    bot.run(TOKEN)
 except discord.errors.LoginFailure as e:
     print("Improper token has been passed.")
