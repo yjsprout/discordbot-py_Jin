@@ -17,11 +17,6 @@ client = commands.Bot(command_prefix="!",intents = discord.Intents.default())
 @client.event
 async def on_ready():
     print("봇 실행됨")
-    try:
-        synced = await sync()
-        print(f"Synced {len(synced)} command(s)")
-    except Exception as e :
-        print(e)
 
 @client.command(name="출석체크")
 async def check(ctx):
