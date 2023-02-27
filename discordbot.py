@@ -23,9 +23,9 @@ async def on_ready():
         print(e)
 
 @bot.command(name="출석체크")
-async def check(interaction: discord.Interaction):
+async def check():
     date_time = datetime.today().strftime('%Y-%m-%d %H:%M')
-    await interaction.response.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_time}")
+    await bot.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_time}")
     # user.name -> 실제 사용자 이름
     # user.display_name -> 서버에서 설정한 별명
 
@@ -39,27 +39,27 @@ async def check(interaction: discord.Interaction):
     cur.close()
 
 @bot.command(name="db조회")
-async def db(interaction: discord.Interaction):
+async def db():
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     cur.execute('SELECT * FROM attTBL')
     lrow=[]
     for row in cur:
         lrow.append(list(row))
-    await interaction.response.send_message(f"{lrow}")
+    await bot.send_message(f"{lrow}")
     cur.close()
 
 @bot.command(name="resetdb")
-async def reset(interaction:discord.Interaction):
+async def reset():
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql3 = "DROP TABLE IF EXISTS attTBL"
     cur.execute(sql3)
     cur.close()
-    await interaction.response.send_message(f"데이터베이스 초기화를 완료하였습니다.")
+    await bot.send_message(f"데이터베이스 초기화를 완료하였습니다.")
 
 @bot.command(name="absentees")
-async def checkAbs(interaction:discord.Interaction):
+async def checkAbs():
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql4 = "SELECT name FROM attTBL"
@@ -72,7 +72,7 @@ async def checkAbs(interaction:discord.Interaction):
     for i in appeared2:
         members.remove(i)
     absent = members
-    await interaction.response.send_message(f"출석 하지 않은 분들 명단 {absent}")
+    await bot.send_message(f"출석 하지 않은 분들 명단 {absent}")
     cur.close()
 
 try:
