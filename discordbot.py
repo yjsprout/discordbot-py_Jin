@@ -11,18 +11,20 @@ load_dotenv()
 PREFIX = os.environ['PREFIX']
 TOKEN = os.environ['TOKEN']
 
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix="!",intents = discord.Intents.default())
+client = discord.Client(intents = discord.Intents.default())
+tree = app_commands.CommandTree(client)
 
-@bot.event
+@client.event
 async def on_ready():
     print("봇 실행됨")
     try:
-        synced = await bot.tree.sync()
+        synced = await tree.sync()
         print(f"Synced {len(synced)} command(s)")
     except Exception as e :
         print(e)
 
-@bot.tree.command(name="출석체크")
+@tree.command(name="출석체크")
 async def check(interaction: discord.Interaction):
     date_time = datetime.today().strftime('%Y-%m-%d %H:%M')
     await interaction.response.send_message(f"{interaction.user.display_name} 출석했습니다.\n{date_time}")
@@ -38,7 +40,7 @@ async def check(interaction: discord.Interaction):
     conn.commit()
     cur.close()
 
-@bot.tree.command(name="db조회")
+@tree.command(name="db조회")
 async def db(interaction: discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
@@ -49,7 +51,7 @@ async def db(interaction: discord.Interaction):
     await interaction.response.send_message(f"{lrow}")
     cur.close()
 
-@bot.tree.command(name="resetdb")
+@tree.command(name="resetdb")
 async def reset(interaction:discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
@@ -58,7 +60,7 @@ async def reset(interaction:discord.Interaction):
     cur.close()
     await interaction.response.send_message(f"데이터베이스 초기화를 완료하였습니다.")
 
-@bot.tree.command(name="absentees")
+@tree.command(name="absentees")
 async def checkAbs(interaction:discord.Interaction):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
