@@ -51,7 +51,7 @@ async def db(ctx):
     cur.close()
 
 @client.command(name="resetdb")
-async def reset(interaction:discord.Interaction):
+async def reset(ctx):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql3 = "DROP TABLE IF EXISTS attTBL"
@@ -60,7 +60,7 @@ async def reset(interaction:discord.Interaction):
     await ctx.send(f"데이터베이스 초기화를 완료하였습니다.")
 
 @client.command(name="absentees")
-async def checkAbs(interaction:discord.Interaction):
+async def checkAbs(ctx):
     conn = sqlite3.connect('Attendance.db')
     cur = conn.cursor()
     sql4 = "SELECT name FROM attTBL"
